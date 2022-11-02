@@ -23,4 +23,10 @@ public class Utils {
         return urlValidator
                 .isValid(email);
     }
+
+    public static String getBaseUrl() {
+        String baseUrl = "http://localhost:8080/";
+
+        return baseUrl;
+    }
 }

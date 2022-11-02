@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UrlShortenerRepo extends JpaRepository<UrlShortenerEntity, Long> {
     Optional<UrlShortenerEntity> findByFullUrl(String fullUrl);
+
+    Optional<UrlShortenerEntity> findByShortUrl(String shortUrl);
 }
