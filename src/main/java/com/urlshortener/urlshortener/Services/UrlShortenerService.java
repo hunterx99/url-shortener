@@ -1,5 +1,6 @@
 package com.urlshortener.urlshortener.Services;
 
+import com.urlshortener.urlshortener.Controller.IdGenerationController;
 import com.urlshortener.urlshortener.Model.UrlShortenerEntity;
 import com.urlshortener.urlshortener.Repository.UrlShortenerRepo;
 import com.urlshortener.urlshortener.Utils.CacheUtils;
@@ -25,17 +26,21 @@ public class UrlShortenerService {
     @Autowired
     CacheUtils cacheUtils;
 
-    @CacheEvict(value = "urls", allEntries = true)
+    @Autowired
+    IdGenerationController idGenerationController;
+
+//    @CacheEvict(value = "urls", allEntries = true)
     public String longUrlToShortUrl(UrlShortenerEntity urlShortener) {
+        long startTime = System.currentTimeMillis();
         System.out.println(urlShortener.toString());
 
         if (!Utils.isValidEmail(urlShortener.getFullUrl())) {
             return "Not a valid email";
         }
 
-        Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = getDataFromCache(urlShortener.getFullUrl());
-//        Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = urlShortenerRepo
-//                    .findByFullUrl(urlShortener.getFullUrl());
+//        Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = getDataFromCache(urlShortener.getFullUrl());
+        Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = urlShortenerRepo
+                    .findByFullUrl(urlShortener.getFullUrl());
 
         if (!urlShortenerEntityFromUrl.isPresent()) {
             log.info("making Db call for fullurl....");
@@ -53,17 +58,39 @@ public class UrlShortenerService {
 
         log.info("Provided Full url not found in DB, moving forward......");
 
+        long id = 0L;
+        String shortString = "";
+
+//        do {
+//
+//            //            shortString = Utils.base10ToBase62(id);
+         while (true) {
+            id = idGenerationController.getId();
+            log.info("id generated {}", id);
+            shortString = Utils.base10ToBase62(id);
+            String temp = getShortUrl(shortString);
+            log.info("temp {}", temp);
+            if (temp.equalsIgnoreCase("not found")) {
+                break;
+            }
+        };
+
+        log.info("shortString generated {}", shortString);
+
         UrlShortenerEntity newUrlShortenerEntity = UrlShortenerEntity
                 .builder()
                 .fullUrl(urlShortener.getFullUrl())
-                .shortUrl(Utils.convertFullUrlToShortUrl(urlShortener.getFullUrl()))
+                .shortUrl(shortString)
                 .createdAt(Instant.now().toString())
                 .expireAt(Instant.now().plus(60, ChronoUnit.DAYS).toString())
                 .status("Active")
                 .build();
 
-        return baseUrl + urlShortenerRepo.save(newUrlShortenerEntity)
+        String newShortUrl = urlShortenerRepo.save(newUrlShortenerEntity)
                 .getShortUrl();
+
+        log.info("Time taken for {} {}", urlShortener.getFullUrl(), (System.currentTimeMillis() - startTime));
+        return baseUrl + newShortUrl;
     }
 
     private Optional<UrlShortenerEntity> getDataFromCache(String fullUrl) {
@@ -81,12 +108,21 @@ public class UrlShortenerService {
         return urlShortenerRepo.findAll();
     }
 
-    @Cacheable("urls")
+//    @Cacheable("urls")
     public String shortUrlToLongUrl(String shortUrl) {
         Optional<UrlShortenerEntity> urlShortenerEntityByShortUrl = urlShortenerRepo.findByShortUrl(shortUrl);
 
         return urlShortenerEntityByShortUrl
                 .map(UrlShortenerEntity::getFullUrl)
                 .orElse("Not Found");
+    }
+
+    public String getShortUrl(String shortUrl) {
+        log.info("making db call for shortUrl {}", shortUrl);
+        Optional<UrlShortenerEntity> urlShortenerEntity = urlShortenerRepo.findByShortUrl(shortUrl);
+
+        return urlShortenerEntity
+                .map(UrlShortenerEntity::getShortUrl)
+                .orElse("not found");
     }
 }
