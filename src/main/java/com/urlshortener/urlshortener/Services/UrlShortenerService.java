@@ -61,9 +61,7 @@ public class UrlShortenerService {
         long id = 0L;
         String shortString = "";
 
-//        do {
-//
-//            //            shortString = Utils.base10ToBase62(id);
+        shortString = Utils.base10ToBase62(id);
          while (true) {
             id = idGenerationController.getId();
             log.info("id generated {}", id);
