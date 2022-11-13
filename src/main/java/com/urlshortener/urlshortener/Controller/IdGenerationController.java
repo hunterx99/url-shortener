@@ -13,9 +13,9 @@ public class IdGenerationController {
     @Autowired
     private RestTemplate template;
 
-    public long getId() {
+    public int getId() {
         log.info("Making rest call...");
         String url = "http://localhost:9091/getId";
-        return template.getForObject(url, Long.class);
+        return template.getForObject(url, Integer.class);
     }
 }

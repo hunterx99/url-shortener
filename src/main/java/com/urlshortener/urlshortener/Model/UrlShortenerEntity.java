@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "urlshortener")
+@Table(name = "urlshortener_seq")
 @Data
 @Builder
 @AllArgsConstructor

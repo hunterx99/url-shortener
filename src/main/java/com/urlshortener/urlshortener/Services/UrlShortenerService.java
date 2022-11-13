@@ -38,7 +38,6 @@ public class UrlShortenerService {
             return "Not a valid email";
         }
 
-//        Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = getDataFromCache(urlShortener.getFullUrl());
         Optional<UrlShortenerEntity> urlShortenerEntityFromUrl = urlShortenerRepo
                     .findByFullUrl(urlShortener.getFullUrl());
 
@@ -58,22 +57,19 @@ public class UrlShortenerService {
 
         log.info("Provided Full url not found in DB, moving forward......");
 
-        long id = 0L;
+        int id = 0;
         String shortString = "";
 
-//        do {
-//
-//            //            shortString = Utils.base10ToBase62(id);
-         while (true) {
-            id = idGenerationController.getId();
-            log.info("id generated {}", id);
-            shortString = Utils.base10ToBase62(id);
-            String temp = getShortUrl(shortString);
-            log.info("temp {}", temp);
-            if (temp.equalsIgnoreCase("not found")) {
-                break;
-            }
-        };
+        id = idGenerationController.getId();
+        log.info("id generated {}", id);
+        shortString = Utils.base10ToBase62(id);
+//        while (true) {
+//            String temp = getShortUrl(shortString);
+//            log.info("temp {}", temp);
+//            if (temp.equalsIgnoreCase("not found")) {
+//                break;
+//            }
+//        };
 
         log.info("shortString generated {}", shortString);
 

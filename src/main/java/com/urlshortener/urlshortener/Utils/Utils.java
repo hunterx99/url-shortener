@@ -36,28 +36,28 @@ public class Utils {
         return baseUrl;
     }
 
-    public static String base10ToBase62(long n) {
+    public static String base10ToBase62(int n) {
 
-        byte[] bytes = Longs.toByteArray(n);
-        String encodedString = Base64.getUrlEncoder().encodeToString(bytes);
-
-        encodedString = encodedString
-                .replaceAll("=", "")
-                .replaceAll("/", "-");
-
-//        StringBuilder sb = new StringBuilder();
+//        byte[] bytes = Longs.toByteArray(n);
+//        String encodedString = Base64.getUrlEncoder().encodeToString(bytes);
 //
-//        while (n != 0) {
-//            sb.insert(0, ELEMENTS.charAt(n % 62));
-//            n /= 62;
-//        }
-//        if(sb.length() < 7) {
-//            while (sb.length() != 7) {
-//                sb.insert(0, '0');
-//            }
-//        }
-//        return sb.toString();
+//        encodedString = encodedString
+//                .replaceAll("=", "")
+//                .replaceAll("/", "-");
+
+        StringBuilder sb = new StringBuilder();
+
+        while (n != 0) {
+            sb.insert(0, ELEMENTS.charAt(n % 62));
+            n /= 62;
+        }
+        if(sb.length() < 7) {
+            while (sb.length() != 7) {
+                sb.insert(0, '0');
+            }
+        }
+        return sb.toString();
 //        return encodedString.substring(0, 8);
-        return encodedString;
+//        return encodedString;
     }
 }
